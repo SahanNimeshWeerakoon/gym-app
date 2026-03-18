@@ -139,7 +139,7 @@ export const DashboardScreen = ({ navigation }: { navigation: any }) => {
       <FAB
         icon="plus"
         label="Add User"
-        onPress={() => navigation.navigate('CreateUser')}
+        onPress={() => navigation.navigate('Users', { screen: 'CreateUser' })}
         style={styles.fab}
       />
     </View>
