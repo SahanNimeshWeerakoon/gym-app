@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Modal, ScrollView } from 'react-native';
-import { Button, TextInput, SegmentedButtons, Checkbox } from 'react-native-paper';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, StyleSheet, Modal, ScrollView, Image, TouchableOpacity, Platform } from 'react-native';
+import { Button, TextInput, SegmentedButtons, Checkbox, Text } from 'react-native-paper';
 import { User } from '../types';
 import { getDayName } from '../utils/attendanceHelper';
 
@@ -23,11 +23,50 @@ export const UserFormModal: React.FC<UserFormProps> = ({
   const [address, setAddress] = useState(initialUser?.address || '');
   const [hasWhatsApp, setHasWhatsApp] = useState(initialUser?.hasWhatsApp || false);
   const [visitingDays, setVisitingDays] = useState<number[]>(initialUser?.visitingDays || []);
+  const [imageUri, setImageUri] = useState<string | undefined>(initialUser?.imageUri);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      // Ensure file input is created for web platform
+      if (!fileInputRef.current) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.style.display = 'none';
+        input.onchange = handleImageSelected as any;
+        if (fileInputRef as any) {
+          (fileInputRef as any).current = input;
+        }
+      }
+    }
+  }, []);
 
   const toggleDay = (day: number) => {
     setVisitingDays(prev =>
       prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
     );
+  };
+
+  const handleImagePick = () => {
+    if (Platform.OS === 'web' && fileInputRef.current) {
+      fileInputRef.current.click();
+    } else {
+      // For mobile platforms, you would integrate with expo-image-picker here
+      alert('Image upload is available on web. For mobile, consider using expo-image-picker.');
+    }
+  };
+
+  const handleImageSelected = (event: any) => {
+    const file = event.target?.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64String = e.target?.result as string;
+        setImageUri(base64String);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSave = () => {
@@ -43,6 +82,7 @@ export const UserFormModal: React.FC<UserFormProps> = ({
       address,
       hasWhatsApp,
       visitingDays,
+      imageUri,
     });
 
     // Reset form
@@ -52,6 +92,18 @@ export const UserFormModal: React.FC<UserFormProps> = ({
     setAddress('');
     setHasWhatsApp(false);
     setVisitingDays([]);
+    setImageUri(undefined);
+    onClose();
+  };
+
+  const handleCancel = () => {
+    setName('');
+    setGender('male');
+    setPhoneNumber('');
+    setAddress('');
+    setHasWhatsApp(false);
+    setVisitingDays([]);
+    setImageUri(undefined);
     onClose();
   };
 
@@ -59,6 +111,31 @@ export const UserFormModal: React.FC<UserFormProps> = ({
     <Modal visible={visible} transparent animationType="slide">
       <ScrollView style={styles.container}>
         <View style={styles.content}>
+          {/* Image Upload Section */}
+          <View style={styles.imageSection}>
+            <TouchableOpacity 
+              style={styles.imageContainer}
+              onPress={handleImagePick}
+            >
+              {imageUri ? (
+                <Image source={{ uri: imageUri }} style={styles.image} />
+              ) : (
+                <View style={styles.placeholderImage}>
+                  <Button icon="camera-plus">Select Image</Button>
+                </View>
+              )}
+            </TouchableOpacity>
+            {imageUri && (
+              <Button 
+                mode="text" 
+                onPress={() => setImageUri(undefined)}
+                style={styles.removeImageButton}
+              >
+                Remove Image
+              </Button>
+            )}
+          </View>
+
           <TextInput
             label="Name"
             value={name}
@@ -113,7 +190,7 @@ export const UserFormModal: React.FC<UserFormProps> = ({
                     onPress={() => toggleDay(day)}
                   />
                   <View style={{ marginLeft: 8 }}>
-                    <View style={styles.dayName}>{getDayName(day)}</View>
+                    <Text style={styles.dayName}>{getDayName(day)}</Text>
                   </View>
                 </View>
               ))}
@@ -126,15 +203,7 @@ export const UserFormModal: React.FC<UserFormProps> = ({
             </Button>
             <Button
               mode="outlined"
-              onPress={() => {
-                setName('');
-                setGender('male');
-                setPhoneNumber('');
-                setAddress('');
-                setHasWhatsApp(false);
-                setVisitingDays([]);
-                onClose();
-              }}
+              onPress={handleCancel}
               style={styles.button}
             >
               Cancel
@@ -157,6 +226,36 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     margin: 16,
+  },
+  imageSection: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  imageContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: '#ddd',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  image: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+  },
+  placeholderImage: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 60,
+  },
+  removeImageButton: {
+    marginTop: 4,
   },
   input: {
     marginBottom: 12,

@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from 'axios';
 import { User, AttendanceRecord } from '../types';
 
 // Configure your API base URL here
-const API_BASE_URL = 'https://your-api.com/api'; // Replace with your API
+const API_BASE_URL = 'http://localhost:3000';
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -19,22 +19,66 @@ apiClient.interceptors.request.use(async config => {
   return config;
 });
 
+// CreateUserDto interface for API compatibility
+interface CreateUserDto {
+  name: string;
+  gender: string;
+  phoneNumber: string;
+  address: string;
+  isWhatsappAvailable: boolean;
+  visitDays: string[];
+}
+
+// Normalize API user payload to app User model
+const normalizeUser = (raw: any): User => {
+  const visitingDaysRaw = raw.visitingDays ?? raw.visitDays ?? [];
+  const visitingDays = Array.isArray(visitingDaysRaw)
+    ? visitingDaysRaw.map((day: number | string) => Number(day)).filter((d: number) => !isNaN(d))
+    : [];
+
+  return {
+    id: raw.id ?? raw._id ?? '',
+    name: raw.name ?? '',
+    gender: raw.gender ?? 'other',
+    phoneNumber: raw.phoneNumber ?? raw.phone ?? '',
+    address: raw.address ?? '',
+    hasWhatsApp: raw.hasWhatsApp ?? raw.isWhatsappAvailable ?? false,
+    visitingDays,
+    imageUri: raw.imageUri ?? raw.image ?? undefined,
+    createdAt: raw.createdAt ?? new Date().toISOString(),
+    lastUpdated: raw.lastUpdated ?? new Date().toISOString(),
+  };
+};
+
 // ============ Users API ============
 
 export const usersAPI = {
   getAllUsers: async (): Promise<User[]> => {
     const response = await apiClient.get('/users');
-    return response.data;
+    console.log('API response.data:', response.data);
+
+    let rawUsers: any[] = [];
+    if (Array.isArray(response.data)) {
+      rawUsers = response.data;
+    } else if (response.data?.users && Array.isArray(response.data.users)) {
+      rawUsers = response.data.users;
+    } else if (response.data?.data && Array.isArray(response.data.data)) {
+      rawUsers = response.data.data;
+    }
+
+    const users = rawUsers.map(normalizeUser);
+    console.log('Normalized users:', users);
+    return users;
   },
 
   getUserById: async (userId: string): Promise<User> => {
     const response = await apiClient.get(`/users/${userId}`);
-    return response.data;
+    return normalizeUser(response.data);
   },
 
-  createUser: async (user: Omit<User, 'id' | 'createdAt' | 'lastUpdated'>): Promise<User> => {
+  createUser: async (user: CreateUserDto | Omit<User, 'id' | 'createdAt' | 'lastUpdated'>): Promise<User> => {
     const response = await apiClient.post('/users', user);
-    return response.data;
+    return normalizeUser(response.data);
   },
 
   updateUser: async (userId: string, user: Partial<User>): Promise<User> => {
