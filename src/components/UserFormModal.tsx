@@ -109,123 +109,131 @@ export const UserFormModal: React.FC<UserFormProps> = ({
 
   return (
     <Modal visible={visible} transparent animationType="slide">
-      <ScrollView style={styles.container}>
-        <View style={styles.content}>
-          {/* Image Upload Section */}
-          <View style={styles.imageSection}>
-            <TouchableOpacity 
-              style={styles.imageContainer}
-              onPress={handleImagePick}
-            >
-              {imageUri ? (
-                <Image source={{ uri: imageUri }} style={styles.image} />
-              ) : (
-                <View style={styles.placeholderImage}>
-                  <Button icon="camera-plus">Select Image</Button>
-                </View>
-              )}
-            </TouchableOpacity>
-            {imageUri && (
-              <Button 
-                mode="text" 
-                onPress={() => setImageUri(undefined)}
-                style={styles.removeImageButton}
+      <View style={styles.overlay}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.content}>
+            {/* Image Upload Section */}
+            <View style={styles.imageSection}>
+              <TouchableOpacity 
+                style={styles.imageContainer}
+                onPress={handleImagePick}
               >
-                Remove Image
-              </Button>
-            )}
-          </View>
-
-          <TextInput
-            label="Name"
-            value={name}
-            onChangeText={setName}
-            style={styles.input}
-            mode="outlined"
-          />
-
-          <SegmentedButtons
-            value={gender}
-            onValueChange={value => setGender(value as 'male' | 'female' | 'other')}
-            buttons={[
-              { value: 'male', label: 'Male' },
-              { value: 'female', label: 'Female' },
-              { value: 'other', label: 'Other' },
-            ]}
-            style={styles.segment}
-          />
-
-          <TextInput
-            label="Phone Number"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-            style={styles.input}
-            mode="outlined"
-            keyboardType="phone-pad"
-          />
-
-          <TextInput
-            label="Address"
-            value={address}
-            onChangeText={setAddress}
-            style={styles.input}
-            mode="outlined"
-            multiline
-          />
-
-          <View style={styles.checkboxContainer}>
-            <Checkbox.Item
-              label="WhatsApp Available"
-              status={hasWhatsApp ? 'checked' : 'unchecked'}
-              onPress={() => setHasWhatsApp(!hasWhatsApp)}
-            />
-          </View>
-
-          <View style={styles.daysContainer}>
-            <View style={styles.daysLabel}>
-              {[0, 1, 2, 3, 4, 5, 6].map(day => (
-                <View key={day} style={styles.dayCheckbox}>
-                  <Checkbox
-                    status={visitingDays.includes(day) ? 'checked' : 'unchecked'}
-                    onPress={() => toggleDay(day)}
-                  />
-                  <View style={{ marginLeft: 8 }}>
-                    <Text style={styles.dayName}>{getDayName(day)}</Text>
+                {imageUri ? (
+                  <Image source={{ uri: imageUri }} style={styles.image} />
+                ) : (
+                  <View style={styles.placeholderImage}>
+                    <Button icon="camera-plus">Select Image</Button>
                   </View>
-                </View>
-              ))}
+                )}
+              </TouchableOpacity>
+              {imageUri && (
+                <Button 
+                  mode="text" 
+                  onPress={() => setImageUri(undefined)}
+                  style={styles.removeImageButton}
+                >
+                  Remove Image
+                </Button>
+              )}
+            </View>
+
+            <TextInput
+              label="Name"
+              value={name}
+              onChangeText={setName}
+              style={styles.input}
+              mode="outlined"
+            />
+
+            <SegmentedButtons
+              value={gender}
+              onValueChange={value => setGender(value as 'male' | 'female' | 'other')}
+              buttons={[
+                { value: 'male', label: 'Male' },
+                { value: 'female', label: 'Female' },
+                { value: 'other', label: 'Other' },
+              ]}
+              style={styles.segment}
+            />
+
+            <TextInput
+              label="Phone Number"
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
+              style={styles.input}
+              mode="outlined"
+              keyboardType="phone-pad"
+            />
+
+            <TextInput
+              label="Address"
+              value={address}
+              onChangeText={setAddress}
+              style={styles.input}
+              mode="outlined"
+              multiline
+            />
+
+            <View style={styles.checkboxContainer}>
+              <Checkbox.Item
+                label="WhatsApp Available"
+                status={hasWhatsApp ? 'checked' : 'unchecked'}
+                onPress={() => setHasWhatsApp(!hasWhatsApp)}
+              />
+            </View>
+
+            <View style={styles.daysContainer}>
+              <View style={styles.daysLabel}>
+                {[0, 1, 2, 3, 4, 5, 6].map(day => (
+                  <View key={day} style={styles.dayCheckbox}>
+                    <Checkbox
+                      status={visitingDays.includes(day) ? 'checked' : 'unchecked'}
+                      onPress={() => toggleDay(day)}
+                    />
+                    <View style={{ marginLeft: 8 }}>
+                      <Text style={styles.dayName}>{getDayName(day)}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.buttonGroup}>
+              <Button mode="contained" onPress={handleSave} style={styles.button}>
+                Save
+              </Button>
+              <Button
+                mode="outlined"
+                onPress={handleCancel}
+                style={styles.button}
+              >
+                Cancel
+              </Button>
             </View>
           </View>
-
-          <View style={styles.buttonGroup}>
-            <Button mode="contained" onPress={handleSave} style={styles.button}>
-              Save
-            </Button>
-            <Button
-              mode="outlined"
-              onPress={handleCancel}
-              style={styles.button}
-            >
-              Cancel
-            </Button>
-          </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
-    paddingTop: 50,
+    justifyContent: 'center',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingVertical: 20,
   },
   content: {
     backgroundColor: 'white',
     padding: 16,
     borderRadius: 8,
-    margin: 16,
+    marginHorizontal: 16,
+    maxHeight: '80%',
   },
   imageSection: {
     alignItems: 'center',

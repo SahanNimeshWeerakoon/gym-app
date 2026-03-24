@@ -21,7 +21,6 @@ export const UserCard: React.FC<UserCardProps> = ({
   showMarkButton = false,
   isAttended = false,
 }) => {
-  console.log({user});
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
       <Card style={styles.card}>

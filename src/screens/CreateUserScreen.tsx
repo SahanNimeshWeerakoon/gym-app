@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { useDispatch } from 'react-redux';
+import { useFocusEffect } from '@react-navigation/native';
 import { Snackbar } from 'react-native-paper';
 import { addUser } from '../store/usersSlice';
 import { UserFormModal } from '../components/UserFormModal';
@@ -14,6 +15,12 @@ export const CreateUserScreen: React.FC<{ navigation: any }> = ({ navigation }) 
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
   const [isLoading, setIsLoading] = useState(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setModalVisible(true);
+    }, [])
+  );
 
   const handleSaveUser = async (userData: Omit<User, 'id' | 'createdAt' | 'lastUpdated'>) => {
     setIsLoading(true);
