@@ -25,7 +25,7 @@ export const calculateUserStats = (
     const dateStr = format(currentDate, 'yyyy-MM-dd');
 
     // Check if user should visit on this day
-    if (user.visitingDays.includes(dayOfWeek)) {
+    if ((user.visitingDays ?? []).includes(dayOfWeek)) {
       totalScheduledDays++;
 
       // Check if attended
@@ -53,7 +53,7 @@ export const calculateUserStats = (
     const dayOfWeek = checkDate.getDay();
     const dateStr = format(checkDate, 'yyyy-MM-dd');
 
-    if (user.visitingDays.includes(dayOfWeek)) {
+    if ((user.visitingDays ?? []).includes(dayOfWeek)) {
       const wasVisited = attendanceRecords.some(
         r => r.userId === user.id && r.date === dateStr && r.marked
       );
@@ -116,7 +116,7 @@ export const getUsersForDate = (
   const isFutureDate = isAfter(selectedDate, new Date());
 
   return users
-    .filter(user => user.visitingDays.includes(dayOfWeek))
+    .filter(user => (user.visitingDays ?? []).includes(dayOfWeek))
     .map(user => {
       const record = attendanceRecords.find(r => r.userId === user.id && r.date === date);
       const attended = record?.marked || false;
@@ -159,5 +159,5 @@ export const getDayName = (dayOfWeek: number): string => {
 export const shouldSendReminder = (user: User, date: string): boolean => {
   const selectedDate = parse(date, 'yyyy-MM-dd', new Date());
   const dayOfWeek = selectedDate.getDay();
-  return user.visitingDays.includes(dayOfWeek);
+  return (user.visitingDays ?? []).includes(dayOfWeek);
 };

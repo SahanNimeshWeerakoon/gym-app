@@ -7,6 +7,7 @@ export interface User {
   address: string;
   hasWhatsApp: boolean;
   visitingDays: number[]; // 0-6 (Sunday-Saturday)
+  imageUri?: string; // User profile image
   createdAt: string;
   lastUpdated: string;
 }

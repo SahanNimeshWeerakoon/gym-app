@@ -1,21 +1,52 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { FAB, Searchbar, Button } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { UserCard } from '../components/UserCard';
 import { calculateUserStats } from '../utils/attendanceHelper';
+import { usersAPI } from '../utils/api';
+import { setUsers, setLoading, setError } from '../store/usersSlice';
 
 export const UserListScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const dispatch = useDispatch();
   const users = useSelector((state: RootState) => state.users.users);
   const attendance = useSelector((state: RootState) => state.attendance.records);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredUsers, setFilteredUsers] = useState(users);
   const [stats, setStats] = useState<any[]>([]);
-
-  useEffect(() => {
-    filterUsers();
+  const filteredUsers = useMemo(() => {
+    if (searchQuery.trim() === '') {
+      return users;
+    } else {
+      const query = searchQuery.toLowerCase();
+      return users.filter(
+        user =>
+          user.name.toLowerCase().includes(query) ||
+          user.phoneNumber.includes(query)
+      );
+    }
   }, [searchQuery, users]);
+
+  // Fetch users from backend on component mount
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        dispatch(setLoading(true));
+        const fetchedUsers = await usersAPI.getAllUsers();
+        console.log({fetchedUsers});
+        console.log('Dispatching setUsers with length:', fetchedUsers.length);
+        dispatch(setUsers(fetchedUsers));
+        dispatch(setError(null));
+      } catch (error) {
+        console.error('Failed to fetch users:', error);
+        dispatch(setError('Failed to load users'));
+      } finally {
+        dispatch(setLoading(false));
+      }
+    };
+
+    fetchUsers();
+  }, [dispatch]);
 
   useEffect(() => {
     const calculatedStats = users.map(user =>
@@ -23,21 +54,6 @@ export const UserListScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     );
     setStats(calculatedStats);
   }, [users, attendance]);
-
-  const filterUsers = () => {
-    if (searchQuery.trim() === '') {
-      setFilteredUsers(users);
-    } else {
-      const query = searchQuery.toLowerCase();
-      setFilteredUsers(
-        users.filter(
-          user =>
-            user.name.toLowerCase().includes(query) ||
-            user.phoneNumber.includes(query)
-        )
-      );
-    }
-  };
 
   const getStatsForUser = (userId: string) => {
     return stats.find(s => s.userId === userId) || { visitingPercentage: 0 };

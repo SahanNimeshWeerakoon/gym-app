@@ -35,7 +35,7 @@ export const UserDetailScreen: React.FC<{ navigation: any; route: any }> = ({
       let currentDate = new Date(today);
       while (currentDate <= next30Days) {
         const dayOfWeek = currentDate.getDay();
-        if (user.visitingDays.includes(dayOfWeek)) {
+        if ((user.visitingDays ?? []).includes(dayOfWeek)) {
           upcoming.push(format(currentDate, 'yyyy-MM-dd'));
         }
         currentDate.setDate(currentDate.getDate() + 1);
@@ -110,7 +110,7 @@ export const UserDetailScreen: React.FC<{ navigation: any; route: any }> = ({
               Phone:
             </Text>
             <Text variant="bodySmall">{user.phoneNumber}</Text>
-            {user.hasWhatsApp && <Chip label="WhatsApp" size="small" style={styles.chip} />}
+            {user.hasWhatsApp && <Chip compact style={styles.chip}>WhatsApp</Chip>}
           </View>
 
           <View style={styles.infoRow}>
@@ -125,8 +125,10 @@ export const UserDetailScreen: React.FC<{ navigation: any; route: any }> = ({
               Visiting Days:
             </Text>
             <View style={styles.daysContainer}>
-              {user.visitingDays.map(day => (
-                <Chip key={day} label={getDayName(day)} size="small" style={styles.chip} />
+              {(user.visitingDays ?? []).map(day => (
+                <Chip key={day} compact style={styles.chip}>
+                  {getDayName(day)}
+                </Chip>
               ))}
             </View>
           </View>
@@ -185,7 +187,6 @@ export const UserDetailScreen: React.FC<{ navigation: any; route: any }> = ({
                 <Button
                   mode={isAttended ? 'contained' : 'outlined'}
                   onPress={() => handleMarkVisited(date)}
-                  size="small"
                   disabled={isAttended}
                 >
                   {isAttended ? '✓ Attended' : 'Mark'}
@@ -204,7 +205,9 @@ export const UserDetailScreen: React.FC<{ navigation: any; route: any }> = ({
             {recentAttendance.map(record => (
               <View key={record.id} style={styles.attendanceRow}>
                 <Text variant="bodySmall">{formatDateForDisplay(record.date)}</Text>
-                <Chip label={record.markedBy} size="small" style={styles.chip} />
+                <Chip compact style={styles.chip}>
+                  {record.markedBy}
+                </Chip>
               </View>
             ))}
           </Card.Content>

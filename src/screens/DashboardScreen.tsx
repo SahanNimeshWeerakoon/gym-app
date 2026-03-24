@@ -8,6 +8,8 @@ import { setAttendanceRecords } from '../store/attendanceSlice';
 import { usersStorage, attendanceStorage } from '../utils/storage';
 import { UserCard } from '../components/UserCard';
 import { calculateUserStats } from '../utils/attendanceHelper';
+import { usersAPI, attendanceAPI } from '../utils/api';
+import { User, AttendanceRecord } from '../types';
 
 export const DashboardScreen = ({ navigation }: { navigation: any }) => {
   const dispatch = useDispatch();
@@ -25,15 +27,31 @@ export const DashboardScreen = ({ navigation }: { navigation: any }) => {
   }, [users, attendance]);
 
   const loadData = async () => {
+    console.log('loadData called');
+    let loadedUsers: User[] = [];
+    let loadedAttendance: AttendanceRecord[] = [];
     try {
       setLoading(true);
-      const loadedUsers = await usersStorage.getAllUsers();
-      const loadedAttendance = await attendanceStorage.getAllRecords();
-      
+      loadedUsers = await usersAPI.getAllUsers();
+      console.log('Dispatching setUsers with loadedUsers:', loadedUsers);
       dispatch(setUsers(loadedUsers));
+      
+      loadedAttendance = await attendanceAPI.getAttendanceRecords();
       dispatch(setAttendanceRecords(loadedAttendance));
     } catch (error) {
       console.error('Error loading data:', error);
+      // Fallback to local storage if API fails
+      try {
+        if (loadedUsers.length === 0) {
+          const localUsers = await usersStorage.getAllUsers();
+          console.log('Dispatching setUsers with localUsers:', localUsers);
+          dispatch(setUsers(localUsers));
+        }
+        const localAttendance = await attendanceStorage.getAllRecords();
+        dispatch(setAttendanceRecords(localAttendance));
+      } catch (localError) {
+        console.error('Error loading local data:', localError);
+      }
     } finally {
       setLoading(false);
     }
