@@ -7,6 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
+
 import {
   DashboardScreen,
   UserListScreen,
@@ -16,8 +17,59 @@ import {
   PercentageFilterScreen,
 } from './src/screens';
 
+// Helper to generate header options with custom title
+function getHeaderOptions(title: string) {
+  return {
+    headerTitle: () => <HeaderWithDate title={title} />,
+    headerTitleContainerStyle: {
+      width: '100%' as `${number}%`
+    }
+  };
+}
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+
+import { View, Text } from 'react-native';
+
+function HeaderWithDate({title}: {title: string}) {
+  const dateObj = new Date();
+  const month = dateObj.toLocaleString('en-US', { month: 'short' });
+  const dayNum = dateObj.getDate();
+  const date = `${month} ${dayNum}`;
+  const day = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+      <Text style={{ fontWeight: 'bold', fontSize: 20, color: '#2196F3' }}>{title}</Text>
+      <Text style={{ textAlign: 'right', fontSize: 14, color: '#666' }}>
+        {date && (
+          <>
+            <Text>{date}</Text>
+            <Text
+              style={{
+                marginLeft: 8,
+                fontStyle: 'italic',
+                backgroundColor: '#E3F2FD', // light blue
+                color: '#1976D2', // strong blue
+                paddingHorizontal: 10,
+                paddingVertical: 2,
+                borderRadius: 12,
+                fontWeight: 'bold',
+                shadowColor: '#1976D2',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.18,
+                shadowRadius: 3,
+                elevation: 2,
+              }}
+            >
+              {' ' + day}
+            </Text>
+          </>
+        )}
+      </Text>
+    </View>
+  );
+}
 
 // Dashboard Stack Navigator
 function DashboardStack() {
@@ -34,14 +86,12 @@ function DashboardStack() {
       <Stack.Screen
         name="DashboardHome"
         component={DashboardScreen}
-        options={{ title: 'Dashboard' }}
+        options={() => getHeaderOptions('Dashboard')}
       />
       <Stack.Screen
         name="UserDetail"
         component={UserDetailScreen}
-        options={({ route }: any) => ({
-          title: 'User Details',
-        })}
+        options={() => getHeaderOptions('User Details')}
       />
     </Stack.Navigator>
   );
@@ -62,17 +112,17 @@ function UsersStack() {
       <Stack.Screen
         name="UserListHome"
         component={UserListScreen}
-        options={{ title: 'All Users' }}
+        options={() => getHeaderOptions('All Users')}
       />
       <Stack.Screen
         name="CreateUser"
         component={CreateUserScreen}
-        options={{ title: 'Add New User' }}
+        options={() => getHeaderOptions('Add New User')}
       />
       <Stack.Screen
         name="UserDetail"
         component={UserDetailScreen}
-        options={{ title: 'User Details' }}
+        options={() => getHeaderOptions('User Details')}
       />
     </Stack.Navigator>
   );
@@ -93,17 +143,17 @@ function FiltersStack() {
       <Stack.Screen
         name="DateFilterHome"
         component={DateFilterScreen}
-        options={{ title: 'Filter by Date' }}
+        options={() => getHeaderOptions('Filter by Date')}
       />
       <Stack.Screen
         name="PercentageFilterHome"
         component={PercentageFilterScreen}
-        options={{ title: 'Filter by Attendance' }}
+        options={() => getHeaderOptions('Filter by Attendance')}
       />
       <Stack.Screen
         name="UserDetail"
         component={UserDetailScreen}
-        options={{ title: 'User Details' }}
+        options={() => getHeaderOptions('User Details')}
       />
     </Stack.Navigator>
   );

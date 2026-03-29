@@ -11,7 +11,8 @@ import { calculateUserStats } from '../utils/attendanceHelper';
 import { usersAPI, attendanceAPI } from '../utils/api';
 import { User, AttendanceRecord } from '../types';
 
-export const DashboardScreen = ({ navigation }: { navigation: any }) => {
+export const DashboardScreen = ({ navigation, route }: { navigation: any, route?: any }) => {
+
   const dispatch = useDispatch();
   const users = useSelector((state: RootState) => state.users.users);
   const attendance = useSelector((state: RootState) => state.attendance.records);
@@ -165,6 +166,7 @@ export const DashboardScreen = ({ navigation }: { navigation: any }) => {
 };
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
