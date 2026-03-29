@@ -12,20 +12,7 @@ import { usersAPI, attendanceAPI } from '../utils/api';
 import { User, AttendanceRecord } from '../types';
 
 export const DashboardScreen = ({ navigation, route }: { navigation: any, route?: any }) => {
-  // Date and Day
-  const [currentDate, setCurrentDate] = useState('');
-  const [currentDay, setCurrentDay] = useState('');
 
-  useEffect(() => {
-    const now = new Date();
-    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    setCurrentDate(now.toLocaleDateString(undefined, options));
-    setCurrentDay(now.toLocaleDateString(undefined, { weekday: 'long' }));
-    // If header update function is provided, update header
-    if (route && route.params && typeof route.params.setHeaderDate === 'function') {
-      route.params.setHeaderDate({ date: now.toLocaleDateString(undefined, options), day: now.toLocaleDateString(undefined, { weekday: 'long' }) });
-    }
-  }, []);
   const dispatch = useDispatch();
   const users = useSelector((state: RootState) => state.users.users);
   const attendance = useSelector((state: RootState) => state.attendance.records);

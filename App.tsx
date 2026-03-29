@@ -85,7 +85,7 @@ function DashboardStack() {
     >
       <Stack.Screen
         name="DashboardHome"
-        component={props => <DashboardScreen {...props} />}
+        component={DashboardScreen}
         options={() => getHeaderOptions('Dashboard')}
       />
       <Stack.Screen
