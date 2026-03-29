@@ -23,67 +23,84 @@ export const UserCard: React.FC<UserCardProps> = ({
 }) => {
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
-      <Card style={styles.card}>
-        <Card.Content>
-          <View style={styles.container}>
-            {/* User Image */}
-            <View style={styles.imageContainer}>
-              {user.imageUri ? (
-                <Image source={{ uri: user.imageUri }} style={styles.image} />
-              ) : (
-                <View style={styles.placeholderImage}>
-                  <Text style={styles.placeholderText}>
-                    {user.name.charAt(0).toUpperCase()}
-                  </Text>
-                </View>
-              )}
-            </View>
-
-            {/* User Info */}
-            <View style={styles.infoSection}>
-              <Text variant="titleMedium" style={styles.name}>
-                {user.name}
-              </Text>
-
-              <View style={styles.daysContainer}>
-                <Text variant="bodySmall" style={styles.daysLabel}>
-                  Days Coming:
+      <View style={styles.cardWrapper}>
+        {/* User Image on top, overlapping card */}
+        <View style={styles.imageOuterContainer}>
+          <View style={styles.imageContainer}>
+            {user.imageUri ? (
+              <Image source={{ uri: user.imageUri }} style={styles.image} />
+            ) : (
+              <View style={styles.placeholderImage}>
+                <Text style={styles.placeholderText}>
+                  {user.name.charAt(0).toUpperCase()}
                 </Text>
-                <View style={styles.daysChips}>
-                  {(user.visitingDays ?? []).map(day => (
-                    <Chip 
-                      key={day} 
-                      compact 
-                      style={styles.dayChip} 
-                    >
-                      {getDayName(day)}
-                    </Chip>
-                  ))}
+              </View>
+            )}
+          </View>
+        </View>
+        <Card style={styles.card}>
+          <Card.Content>
+            <View style={styles.container}>
+              {/* User Info */}
+              <View style={styles.infoSection}>
+                <Text variant="titleMedium" style={styles.name}>
+                  {user.name}
+                </Text>
+                <View style={styles.daysContainer}>
+                  <Text variant="bodySmall" style={styles.daysLabel}>
+                    Days Coming:
+                  </Text>
+                  <View style={styles.daysChips}>
+                    {(user.visitingDays ?? []).map(day => (
+                      <Chip 
+                        key={day} 
+                        compact 
+                        style={styles.dayChip} 
+                      >
+                        {getDayName(day)}
+                      </Chip>
+                    ))}
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-
-          {showMarkButton && (
-            <Button
-              mode={isAttended ? 'contained' : 'outlined'}
-              onPress={onMarkVisited}
-              style={styles.markButton}
-              textColor={isAttended ? '#fff' : undefined}
-            >
-              {isAttended ? '✓ Attended' : 'Mark Attended'}
-            </Button>
-          )}
-        </Card.Content>
-      </Card>
+            {showMarkButton && (
+              <Button
+                mode={isAttended ? 'contained' : 'outlined'}
+                onPress={onMarkVisited}
+                style={styles.markButton}
+                textColor={isAttended ? '#fff' : undefined}
+              >
+                {isAttended ? '✓ Attended' : 'Mark Attended'}
+              </Button>
+            )}
+          </Card.Content>
+        </Card>
+      </View>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
+  cardWrapper: {
+    alignItems: 'center',
     marginHorizontal: 8,
-    marginVertical: 4,
+    marginVertical: 16,
+  },
+  card: {
+    width: '100%',
+    borderRadius: 24,
+    paddingTop: 40,
+    overflow: 'visible',
+    elevation: 3,
+  },
+  imageOuterContainer: {
+    position: 'absolute',
+    top: -40,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 2,
   },
   container: {
     flexDirection: 'row',
@@ -91,18 +108,28 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   imageContainer: {
-    width: 60,
-    height: 60,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    overflow: 'hidden',
+    backgroundColor: '#fff',
+    borderWidth: 3,
+    borderColor: '#fff',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   image: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
   },
   placeholderImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     backgroundColor: '#e0e0e0',
     justifyContent: 'center',
     alignItems: 'center',
