@@ -24,6 +24,21 @@ export const UserCard: React.FC<UserCardProps> = ({
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
       <View style={styles.cardWrapper}>
+        {/* Top right visited button */}
+        <View style={styles.topRightButtonContainer} pointerEvents="box-none">
+          <Button
+            icon="check"
+            mode="contained"
+            onPress={onMarkVisited}
+            style={styles.visitedButton}
+            buttonColor="#4CAF50"
+            contentStyle={{justifyContent: 'center', alignItems: 'center', width: 36, height: 36}}
+            compact
+            disabled={isAttended}
+          >
+            {''}
+          </Button>
+        </View>
         {/* User Image on top, overlapping card */}
         <View style={styles.imageOuterContainer}>
           <View style={styles.imageContainer}>
@@ -85,7 +100,27 @@ const styles = StyleSheet.create({
   cardWrapper: {
     alignItems: 'center',
     marginHorizontal: 8,
-    marginVertical: 16,
+    marginVertical: 24,
+  },
+  topRightButtonContainer: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 10,
+    padding: 8,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    width: '100%',
+  },
+  visitedButton: {
+    borderRadius: 20,
+    minWidth: 36,
+    minHeight: 36,
+    width: 36,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 2,
   },
   card: {
     width: '100%',
